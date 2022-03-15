@@ -3,6 +3,9 @@ project(BreakingCycles)
 
 set(CMAKE_CXX_STANDARD 17)
 
+add_compile_options(-g)
+
 add_executable(BreakingCycles main.cpp)
 add_executable(ExactMain ExactMain.cpp)
 add_executable(HeuristicMain HeuristicMain.cpp)
+add_executable(TimesComparison TimesComparison.cpp)

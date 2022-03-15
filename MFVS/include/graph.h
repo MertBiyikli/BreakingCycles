@@ -175,6 +175,7 @@ bool Graph::IsConnected()
 }
 
 
+
 bool isAcyclic(const Graph& graph, const std::vector<bool>& fvs) {
     int fvs_size = 0;
     for ( size_t i = 0; i < fvs.size(); ++i ) {

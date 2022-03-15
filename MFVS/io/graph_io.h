@@ -85,5 +85,48 @@ int ReadGraph(const std::string& file, Graph& G) {
     return 0;
 }
 
+std::vector<bool> readSolution(const int num_nodes,
+                               const std::string& filename) {
+    std::vector<bool> fvs(num_nodes, false);
+
+    std::string line;
+
+    // open file for reading
+    std::ifstream in(filename.c_str());
+    if (!in) {
+        std::cerr << "Error opening " << filename << std::endl;
+        std::exit(-1);
+    }
+
+    while( std::getline(in, line) ) {
+
+        std::stringstream ss(line);
+        long u;
+        ss >> u;
+
+        if ( u > num_nodes ) {
+            std::cerr << "Invalid node in solution ( Node = " << u << " )" << std::endl;
+            std::exit(-1);
+        }
+
+        if ( !ss.eof() ) {
+            std::cerr << "Line contains more than one node ( Line = '" << line << "'" << std::endl;
+            std::exit(-1);
+        }
+
+        if ( fvs[u - 1] ) {
+            std::cerr << "Node " << u << " is contained multiple times in solution" << std::endl;
+            std::exit(-1);
+        }
+
+        fvs[--u] = true;
+
+        if(in.eof()) {
+            break;
+        }
+    }
+
+    return fvs;
+}
 
 #endif //BREAKINGCYCLES_GRAPH_IO_H
