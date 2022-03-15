@@ -67,7 +67,7 @@ int ReadGraph(const std::string& file, Graph& G) {
             EdgeCounter++;
             //edge_counter++;
             //EdgeID e = G.new_edge(node, target-1);
-            G.graph[node].push_back(target);
+            G.graph[node].push_back(target-1);
             //G.setEdgeWeight(e, edge_weight);
         }
         node++;
