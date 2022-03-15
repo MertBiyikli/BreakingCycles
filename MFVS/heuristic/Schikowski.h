@@ -1,0 +1,8 @@
+//
+// Created by Mert Biyikli on 15.03.22.
+//
+
+#ifndef BREAKINGCYCLES_SCHIKOWSKI_H
+#define BREAKINGCYCLES_SCHIKOWSKI_H
+
+#endif //BREAKINGCYCLES_SCHIKOWSKI_H
