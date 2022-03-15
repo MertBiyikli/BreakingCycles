@@ -144,6 +144,19 @@ ExactMain/fast:
 .PHONY : ExactMain/fast
 
 #=============================================================================
+# Target rules for targets named TimesComparison
+
+# Build rule for target.
+TimesComparison: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 TimesComparison
+.PHONY : TimesComparison
+
+# fast build rule for target.
+TimesComparison/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/TimesComparison.dir/build.make CMakeFiles/TimesComparison.dir/build
+.PHONY : TimesComparison/fast
+
+#=============================================================================
 # Target rules for targets named HeuristicMain
 
 # Build rule for target.
@@ -223,6 +236,33 @@ HeuristicMain.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/HeuristicMain.dir/build.make CMakeFiles/HeuristicMain.dir/HeuristicMain.cpp.s
 .PHONY : HeuristicMain.cpp.s
 
+TimesComparison.o: TimesComparison.cpp.o
+
+.PHONY : TimesComparison.o
+
+# target to build an object file
+TimesComparison.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/TimesComparison.dir/build.make CMakeFiles/TimesComparison.dir/TimesComparison.cpp.o
+.PHONY : TimesComparison.cpp.o
+
+TimesComparison.i: TimesComparison.cpp.i
+
+.PHONY : TimesComparison.i
+
+# target to preprocess a source file
+TimesComparison.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/TimesComparison.dir/build.make CMakeFiles/TimesComparison.dir/TimesComparison.cpp.i
+.PHONY : TimesComparison.cpp.i
+
+TimesComparison.s: TimesComparison.cpp.s
+
+.PHONY : TimesComparison.s
+
+# target to generate assembly for a file
+TimesComparison.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/TimesComparison.dir/build.make CMakeFiles/TimesComparison.dir/TimesComparison.cpp.s
+.PHONY : TimesComparison.cpp.s
+
 main.o: main.cpp.o
 
 .PHONY : main.o
@@ -261,12 +301,16 @@ help:
 	@echo "... BreakingCycles"
 	@echo "... ExactMain"
 	@echo "... HeuristicMain"
+	@echo "... TimesComparison"
 	@echo "... ExactMain.o"
 	@echo "... ExactMain.i"
 	@echo "... ExactMain.s"
 	@echo "... HeuristicMain.o"
 	@echo "... HeuristicMain.i"
 	@echo "... HeuristicMain.s"
+	@echo "... TimesComparison.o"
+	@echo "... TimesComparison.i"
+	@echo "... TimesComparison.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"

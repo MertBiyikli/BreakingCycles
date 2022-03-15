@@ -136,7 +136,7 @@ int SCC::GetSCC_Number() const
 }
 
 class Tarjan{
-public:
+private:
     Graph G;
     int currentIndex;
     int currentComponent;
@@ -145,11 +145,12 @@ public:
     stack<NodeID> S;
     vector<bool> IsInStack;
     vector<int> SCCbyNum;
+    void compute(int, bool);
+public:
     Tarjan(Graph& G);
     vector<vector<NodeID > > SCC;
     vector<vector<int> > getSCC();
     vector<int> getSCC_component();
-    void compute(int, bool);
 };
 
 Tarjan::Tarjan(Graph &G)

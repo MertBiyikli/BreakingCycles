@@ -74,6 +74,7 @@ CMAKE_BINARY_DIR = /Users/halilibrahim/BreakingCycles/cmake-build-debug
 
 # The main recursive "all" target.
 all: CMakeFiles/ExactMain.dir/all
+all: CMakeFiles/TimesComparison.dir/all
 all: CMakeFiles/HeuristicMain.dir/all
 all: CMakeFiles/BreakingCycles.dir/all
 
@@ -86,6 +87,7 @@ preinstall:
 
 # The main recursive "clean" target.
 clean: CMakeFiles/ExactMain.dir/clean
+clean: CMakeFiles/TimesComparison.dir/clean
 clean: CMakeFiles/HeuristicMain.dir/clean
 clean: CMakeFiles/BreakingCycles.dir/clean
 
@@ -117,6 +119,33 @@ ExactMain: CMakeFiles/ExactMain.dir/rule
 CMakeFiles/ExactMain.dir/clean:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ExactMain.dir/build.make CMakeFiles/ExactMain.dir/clean
 .PHONY : CMakeFiles/ExactMain.dir/clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/TimesComparison.dir
+
+# All Build rule for target.
+CMakeFiles/TimesComparison.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/TimesComparison.dir/build.make CMakeFiles/TimesComparison.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/TimesComparison.dir/build.make CMakeFiles/TimesComparison.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/halilibrahim/BreakingCycles/cmake-build-debug/CMakeFiles --progress-num=7,8 "Built target TimesComparison"
+.PHONY : CMakeFiles/TimesComparison.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/TimesComparison.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/halilibrahim/BreakingCycles/cmake-build-debug/CMakeFiles 2
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/TimesComparison.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/halilibrahim/BreakingCycles/cmake-build-debug/CMakeFiles 0
+.PHONY : CMakeFiles/TimesComparison.dir/rule
+
+# Convenience name for target.
+TimesComparison: CMakeFiles/TimesComparison.dir/rule
+
+.PHONY : TimesComparison
+
+# clean rule for target.
+CMakeFiles/TimesComparison.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/TimesComparison.dir/build.make CMakeFiles/TimesComparison.dir/clean
+.PHONY : CMakeFiles/TimesComparison.dir/clean
 
 #=============================================================================
 # Target rules for target CMakeFiles/HeuristicMain.dir

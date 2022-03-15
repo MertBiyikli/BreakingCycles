@@ -1,5 +1,6 @@
 /Users/halilibrahim/BreakingCycles/cmake-build-debug/CMakeFiles/rebuild_cache.dir
 /Users/halilibrahim/BreakingCycles/cmake-build-debug/CMakeFiles/edit_cache.dir
 /Users/halilibrahim/BreakingCycles/cmake-build-debug/CMakeFiles/ExactMain.dir
+/Users/halilibrahim/BreakingCycles/cmake-build-debug/CMakeFiles/TimesComparison.dir
 /Users/halilibrahim/BreakingCycles/cmake-build-debug/CMakeFiles/HeuristicMain.dir
 /Users/halilibrahim/BreakingCycles/cmake-build-debug/CMakeFiles/BreakingCycles.dir

@@ -183,7 +183,7 @@ bool isAcyclic(const Graph& graph, const std::vector<bool>& fvs) {
     }
 
     std::vector<int> in_degree(graph.GetNumVertices(), 0);
-    for ( int u = 0; u < graph.GetNumVertices(); ++u ) {
+    for ( int u = 0; u < graph.GetNumVertices(); u++ ) {
         if ( !fvs[u] ) {
             for ( const int v : graph.neighbors(u) ) {
                 ++in_degree[v];

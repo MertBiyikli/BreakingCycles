@@ -7,7 +7,7 @@
 
 #include <random>
 #include "../include/graph.h"
-
+/*
 struct CompareFVS {
     bool operator()(pair<vector<bool>, int> const& a, pair<vector<bool>, int> const& b)
     {
@@ -74,6 +74,6 @@ pair<vector<bool>, int> EvolutionaryRandomized::GetTheBest()
     this->Best = Q.top();
     return this->Best;
 }
-
+*/
 
 #endif //BREAKINGCYCLES_EVOLUTIONARYRANDOMIZED_H
