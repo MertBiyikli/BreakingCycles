@@ -11,7 +11,7 @@
 struct CompareFVS {
     bool operator()(pair<int, int> const& a, pair<int, int> const& b)
     {
-        return a.second > b.second;
+        return a.second < b.second;
     }
 };
 
@@ -26,7 +26,7 @@ public:
 
 pair<vector<bool>, int> SCCGreedy::Compute() // TODO: try to fix this, the idea is good and might be very fast
 {
-    auto SCC = T.getSCC();
+    auto SCC = T.getSCC(); // TODO: This causes a seg fault
     this->fvs.first.resize(G.GetNumVertices(), false);
     this->fvs.second=0;
     vector<int> indegree(G.GetNumVertices(), 0);
@@ -34,55 +34,57 @@ pair<vector<bool>, int> SCCGreedy::Compute() // TODO: try to fix this, the idea 
     {
         for(auto& u : G.neighbors(v))
         {
-            indegree[u]++;
+            indegree.at(u)++;
         }
     }
-    cout << "before one" << endl;
     vector<int> TotalDegree(G.GetNumVertices(), 0);
     for(NodeID v = 0; v<G.GetNumVertices(); v++)
     {
         TotalDegree[v]=G.GetDegree(v)+indegree[v];
     }
 
-    cout << "before two" << endl;
-    vector<priority_queue<pair<int, int>, vector<pair<int, int>>, CompareFVS> > Queues;
+
+    priority_queue<pair<int, int>, vector<pair<int, int>>, CompareFVS> Queues;
 
     for(auto& i : SCC)
     {
         if(i.size()>1)
         {
-            priority_queue<pair<int, int>, vector<pair<int, int>>, CompareFVS> Q;
             for(auto& u : i)
             {
-                Q.push(make_pair(u, TotalDegree[u]));
+                Queues.push(make_pair(u, TotalDegree[u]));
             }
-            Queues.push_back(Q);
         }
     }
-    cout << "before three" << endl;
-    for(auto i: Queues)
+    for(int it = 0; it<sqrt(Queues.size()); it++)
     {
-        cout << i.size() << " / " << Queues.size() << endl;
+        //cout << Queues.top().first << " " << Queues.top().second << endl;
+        auto u = Queues.top();
+        Queues.pop();
+        this->fvs.first.at(u.first)=true;
+        this->fvs.second++;
     }
-    for(auto& Q : Queues)
-    {
-        this->fvs.first[(Q.top()).first];
-        fvs.second++;
-        Q.pop();
-    }
+
     int ctr = 0;
-    while(!isAcyclic(G, fvs.first)) // TODO: Here is the proble
+    while(!isAcyclic(G, fvs.first)) // TODO: Here is the problem
     {
-        for(auto& Q : Queues)
-        {
-            auto u = Q.top();
-            Q.pop();
-            cout << Q.size() << endl;
-            fvs.first[u.first];
-            fvs.second++;
+        //cout << Queues.top().first << " " << Queues.top().second << endl;
+        if(Queues.size()>10) {
+            for (int it = 0; it < sqrt(Queues.size()); it++) {
+                //cout << Queues.size() << endl;
+                auto u = Queues.top();
+                Queues.pop();
+                this->fvs.first.at(u.first) = true;
+                this->fvs.second++;
+            }
+        }else{
+            //cout << Queues.size() << endl;
+            auto u = Queues.top();
+            Queues.pop();
+            this->fvs.first[u.first] = true;
+            this->fvs.second++;
         }
     }
-    cout << "before five" << endl;
     return this->fvs;
 }
 
