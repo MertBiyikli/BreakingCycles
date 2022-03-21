@@ -7,26 +7,20 @@
 
 #include <random>
 #include "../include/graph.h"
-/*
-struct CompareFVS {
-    bool operator()(pair<vector<bool>, int> const& a, pair<vector<bool>, int> const& b)
-    {
-        return a.second > b.second;
-    }
-};
+
 
 class EvolutionaryRandomized{
 public:
     Graph G;
     int popSize;
 
-    priority_queue<pair<vector<bool>, int>, vector<pair<vector<bool>, int> >, CompareFVS> Q;
+    //priority_queue<pair<vector<bool>, int>, vector<pair<vector<bool>, int> >, CompareFVS> Q;
 
     EvolutionaryRandomized(Graph& G, int N);
     pair<vector<bool>, int> Best;
     vector<pair<vector<bool>, int>> population;
     void InitPopulation();
-    pair<vector<bool>, int> compare(pair<vector<bool>, int>& a, pair<vector<bool>, int>& b);
+    pair<vector<bool>, int> Mutate(pair<vector<bool>, int>& a, pair<vector<bool>, int>& b);
     pair<vector<bool>, int> GetTheBest();
 };
 
@@ -34,46 +28,87 @@ EvolutionaryRandomized::EvolutionaryRandomized(Graph &G, int N)
 {
     this->popSize = N;
     this->G = G;
+    this->Best.first.resize(G.GetNumVertices(), true);
+    this->Best.second=G.GetNumVertices();
 }
 
-void EvolutionaryRandomized::InitPopulation()
+void EvolutionaryRandomized::InitPopulation() {
+    random_device rd;  // Will be used to obtain a seed for the random number engine
+    mt19937 gen(rd()); // Standard mersenne_twister_engine seeded with rd()
+    uniform_real_distribution<> dis(0, G.GetNumVertices());
+
+    for (int i = 0; i < popSize; i++)
+    {
+        auto fvs = make_pair(vector<bool>(G.GetNumVertices()), 0);
+        for(int j = 0; j<sqrt(G.GetNumVertices()); j++)
+        {
+            int randomValue = rand()%G.GetNumVertices();//(gen);
+            if(!fvs.first[randomValue])
+            {
+                fvs.first[randomValue]=true;
+                fvs.second++;
+            }
+        }
+        cout << "Before the while loop" << i << endl;/*
+        while(!isAcyclic(G, fvs.first))
+        {
+            int randomValue = dis(gen);
+            if(!fvs.first[randomValue])
+            {
+                fvs.first[dis(gen)]=true;
+                fvs.second++;
+            }
+        }*/
+        this->population.push_back(fvs);
+    }
+
+}
+
+pair<vector<bool>, int> EvolutionaryRandomized::Mutate(pair<vector<bool>, int>& a, pair<vector<bool>, int>& b)
 {
     random_device rd;  // Will be used to obtain a seed for the random number engine
     mt19937 gen(rd()); // Standard mersenne_twister_engine seeded with rd()
     uniform_real_distribution<> dis(0, G.GetNumVertices());
-    for(int i = 0; i<popSize; i++)
+    auto fvs=make_pair(vector<bool>(G.GetNumVertices(), false), 0);
+    for(NodeID v = 0; v<G.GetNumVertices(); v++)
     {
-        pair<vector<bool>, int> currentFvs;
-        currentFvs.first.resize(G.GetNumVertices(), false);
-        currentFvs.second=0;
-        while(!isAcyclic(G, currentFvs.first)) {
-            for (int j = 0; j < sqrt(G.GetNumVertices() / 2); j++) {
-                int rand = dis(gen);
-                if(!currentFvs.first[rand])
-                {
-                    currentFvs.first[rand]=true;
-                    currentFvs.second++;
-                }
-            }
+        if(a.first[v] && b.first[v])
+        {
+            fvs.first[v]=true;
+            fvs.second++;
         }
-        this->population.push_back(currentFvs);
     }
-}
-
-pair<vector<bool>, int> EvolutionaryRandomized::compare(pair<vector<bool>, int>& a, pair<vector<bool>, int>& b)
-{
-    return (a.second < b.second ? a : b);
+    while(!isAcyclic(G, fvs.first))
+    {
+        int randomValue = dis(gen);
+        if(!fvs.first[randomValue])
+        {
+            fvs.first[randomValue]=true;
+            fvs.second++;
+        }
+    }
+    return fvs;
 }
 
 pair<vector<bool>, int> EvolutionaryRandomized::GetTheBest()
 {
-    for(int i = 0; i<popSize; i+=2)
-    {
-        Q.push(compare(population[i], population[i+1]));
+    cout << "reached GetTheBest" << endl;
+    //for(int i = 0; i<sqrt(popSize); i++) {
+        for (int i = 0; i < population.size(); i++) {
+            auto mutation = this->Mutate(population[i], population[i + 1]);
+            if (population[i].second < population[i + 1].second) {
+                population[i + 1] = mutation;
+            }
+        }
+    //}
+
+    for(auto& i : population) {
+        if (this->Best.second > i.second) {
+            this->Best = i;
+        }
     }
-    this->Best = Q.top();
     return this->Best;
 }
-*/
+
 
 #endif //BREAKINGCYCLES_EVOLUTIONARYRANDOMIZED_H

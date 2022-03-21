@@ -14,10 +14,12 @@
 #include <stack>
 #include <queue>
 
+using namespace std;
 typedef int NodeID;
+
 typedef int EdgeID;
 
-using namespace std;
+typedef pair<vector<bool>, int> FVS;
 
 template<typename IteratorT>
 class IteratorRange {
@@ -50,7 +52,6 @@ class Graph
     using NeighborRange = IteratorRange<NeighborIterator>;
 public:
     std::vector<std::vector<NodeID> > graph;
-    vector<int> InDegree;
 
     void InitTheGraph(const NodeID& n, const EdgeID& m);
     int GetNumEdges() const;
@@ -64,28 +65,9 @@ public:
                 graph[u].cbegin(), graph[u].cend());
     }
 
-    void print();
-    bool isTournemt();
-
-    bool IsConnected();
-    int GetInDegree(NodeID u);
-    vector<int> Indegree();
-
+    void print() const;
     bool DFS(NodeID u, NodeID v);
 };
-
-vector<int> Graph::Indegree()
-{
-    vector<int> Indegree(this->GetNumVertices(), 0);
-    for(NodeID v = 0; v<this->GetNumVertices(); v++)
-    {
-        for(auto u : this->neighbors(v))
-        {
-            Indegree[u]++;
-        }
-    }
-    return Indegree;
-}
 
 
 void Graph::InitTheGraph(const NodeID &n, const EdgeID &m)
@@ -93,15 +75,6 @@ void Graph::InitTheGraph(const NodeID &n, const EdgeID &m)
     this->numEdges = m;
     this->numVertices = n;
     this->graph.resize(this->numVertices);
-/*
-    this->InDegree.resize(this->GetNumVertices(), 0);
-    for(NodeID v = 0; v<this->GetNumVertices(); v++)
-    {
-        for(NodeID u : this->neighbors(v))
-        {
-            InDegree[u]++;
-        }
-    }*/
 }
 
 int Graph::GetNumEdges() const
@@ -140,39 +113,8 @@ int Graph::GetDegree(NodeID n) const
     return graph[n].size();
 }
 
-int Graph::GetInDegree(NodeID u)
-{
-    if(u<0 || u> this->GetNumVertices())
-    {
-        std::cerr << "Not existing node" << std::endl;
-        return -1;
-    }
-    return InDegree[u];
-}
 
 
-
-
-
-
-bool Graph::IsConnected()
-{
-    vector<bool> visited(numVertices, false);
-    cout << "Problem after the visited" << endl;
-    for(NodeID u = 0; u<this->GetNumVertices(); u++)
-    {
-        for(NodeID v = 0; v<this->graph[u].size(); v++)
-        {
-            visited[this->graph[u][v]]=true;
-        }
-    }
-    cout << "Problem after the 1st loop" << endl;
-    for(auto i : visited)
-        if(!i)
-            return false;
-    cout << "Problem after the 2nd loop" << endl;
-    return true;
-}
 
 
 
@@ -215,29 +157,6 @@ bool isAcyclic(const Graph& graph, const std::vector<bool>& fvs) {
     return visited_nodes == (graph.GetNumVertices() - fvs_size);
 }
 
-bool Graph::isTournemt() {
-    bool result = true;
-    vector<vector<NodeID> > AdjacenzMatrix(this->GetNumVertices(), vector<NodeID>(this->GetNumVertices(),0));
-    for(NodeID v = 0; v<this->numVertices; v++){
-        for(auto u : neighbors(v)){
-            AdjacenzMatrix[v][u]=1;
-        }
-    }
-    for (NodeID v = 0; v < this->GetNumVertices(); v++){
-        for(NodeID u = 0; u<this->GetNumVertices(); u++)
-        {
-            if(v==u)
-            {
-                continue;
-            }
-            if(AdjacenzMatrix[v][u]==0 && AdjacenzMatrix[u][v]==0)
-            {
-                result= false;
-            }
-        }
-    }
-    return result;
-}
 
 bool Graph::DFS(NodeID u, NodeID v)
 {
@@ -262,8 +181,8 @@ bool Graph::DFS(NodeID u, NodeID v)
     return false;
 }
 
-void Graph::print() {
-    for(NodeID v = 0; v<numVertices; v++)
+void Graph::print() const {
+    for(NodeID v = 0; v<this->GetNumVertices(); v++)
     {
         cout << v <<": ";
         for(auto u : this->neighbors(v))

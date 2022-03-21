@@ -3,7 +3,7 @@ project(BreakingCycles)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_compile_options(-g)
+add_custom_target(-g -o MFVS/heuristic/MakeMinimalWithSorting.cpp)
 
 add_executable(BreakingCycles main.cpp)
 add_executable(ExactMain ExactMain.cpp)
