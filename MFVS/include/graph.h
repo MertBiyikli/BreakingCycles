@@ -60,6 +60,7 @@ public:
     int GetDegree(NodeID) const;
     NodeID numVertices;
     EdgeID numEdges;
+    void deleteVertex(NodeID);
     NeighborRange neighbors(const int u) const {
         return NeighborRange(
                 graph[u].cbegin(), graph[u].cend());
@@ -69,6 +70,7 @@ public:
     bool DFS(NodeID u, NodeID v);
 };
 
+bool isAcyclic(const Graph& graph, const std::vector<bool>& fvs);
 
 void Graph::InitTheGraph(const NodeID &n, const EdgeID &m)
 {
@@ -190,6 +192,22 @@ void Graph::print() const {
             cout << u << " ";
         }
         cout << endl;
+    }
+}
+
+void Graph::deleteVertex(NodeID v)
+{
+    this->numVertices--;
+    this->graph.erase(graph.begin()+v);
+    for(NodeID it = 0; it<this->graph.size(); it++)
+    {
+        for(NodeID u=0; u< this->graph[it].size(); u++)
+        {
+            if(graph[it][u]==v)
+            {
+                graph[it].erase(graph[it].begin()+u);
+            }
+        }
     }
 }
 
