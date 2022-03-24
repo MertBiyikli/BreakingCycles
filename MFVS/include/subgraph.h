@@ -14,6 +14,7 @@ public:
     Graph G;
     map<NodeID , int> M; // the first value: index in original graph; second is index for the subgraph
     Subgraph(Graph& G_, vector<bool>& included);
+    //Subgraph(Graph& G_, vector<bool>& included, bool merged);
     pair<Graph, map<NodeID, int> > GetSubGraph();
 };
 
@@ -51,12 +52,46 @@ Subgraph::Subgraph(Graph &G_, vector<bool> &included) {
                         }
                     }
                     G.graph[tmp.second].push_back(tmp_2.second);
+                    G.numEdges++;
                     }
                 }
             }
         }
     }
+/*
+Subgraph::Subgraph(Graph &G_, vector<bool> &included, bool merged)
+{
 
+
+
+
+
+    for(NodeID v = 0; v<G.GetNumVertices(); v++) {
+        vector<NodeID> InComingNeig;
+        vector<NodeID> OutGoing = G.graph[maxV.first];
+        for (NodeID v = 0; v < G.GetNumVertices(); v++) {
+            for (auto u : G.neighbors(v)) {
+                if (u == maxV.first) {
+                    InComingNeig.push_back(v);
+                }
+            }
+        }
+        Graph rightGraph = Subgraph(G, left).GetSubGraph().first;
+        for (NodeID In : InComingNeig) {
+            for (NodeID Out : OutGoing) {
+                bool EdgeExists = false;
+                for (auto it : rightGraph.graph[In]) {
+                    if (it == Out) {
+                        EdgeExists = true;
+                    }
+                }
+                if (!EdgeExists) {
+                    rightGraph.graph[In].push_back(Out);
+                }
+            }
+        }
+    }
+}*/
 
 pair<Graph, map<NodeID, int> >  Subgraph::GetSubGraph()
 {

@@ -68,6 +68,7 @@ public:
 
     void print() const;
     bool DFS(NodeID u, NodeID v);
+    //bool isInLoop(NodeID);
 };
 
 bool isAcyclic(const Graph& graph, const std::vector<bool>& fvs);
