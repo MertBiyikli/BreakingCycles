@@ -53,6 +53,7 @@ FVS BranchBound::MFVS(bool verbose)
     return this->mfvs(h, make_pair(vector<bool>(h.GetNumVertices(), false), 0), vs, 0, 0, true, verbose);
 }
 
+// TODO: fix this. It works super fine for e_001 but every other instances it is crap. Propably because the scc for e_001 is only one
 FVS BranchBound::mfvs(Graph &G__, FVS solution, FVS& bestSolution, int lowerBound, int level,
                       bool reducible, bool verbos) {
 
