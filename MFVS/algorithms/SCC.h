@@ -12,6 +12,7 @@
 class Tarjan{
 private:
     Graph G;
+    vector<bool> included;
     int currentIndex;
     int currentComponent;
     vector<NodeID> indices;
@@ -22,6 +23,7 @@ private:
     void compute(int, bool);
 public:
     Tarjan(Graph& G);
+    Tarjan(Graph& G, vector<bool>& vec);
     vector<vector<NodeID > > SCC;
     vector<vector<int> > getSCC();
     vector<int> getSCC_component();
@@ -30,6 +32,13 @@ public:
 Tarjan::Tarjan(Graph &G)
 {
     this->G=G;
+    this->included.resize(G.GetNumVertices(), true);
+}
+
+Tarjan::Tarjan(Graph &G, vector<bool> &vec)
+{
+    this->G = G;
+    this->included=vec;
 }
 
 vector<vector<int>> Tarjan::getSCC() {
@@ -39,9 +48,11 @@ vector<vector<int>> Tarjan::getSCC() {
     this->IsInStack.resize(G.GetNumVertices(), false);
 
     this->SCC = vector<vector<int> >();
-    for (NodeID it = 0; it<G.GetNumVertices(); it++) {
-        if (indices[it] == -1) {
-            compute(it, false);
+    for (NodeID it = 0; it < G.GetNumVertices(); it++) {
+        if(included[it]) {
+            if (indices[it] == -1) {
+                compute(it, false);
+            }
         }
     }
     return this->SCC;
@@ -57,8 +68,10 @@ vector<int> Tarjan::getSCC_component()
 
     this->SCCbyNum.resize(G.GetNumVertices());
     for (NodeID it = 0; it<G.GetNumVertices(); it++) {
-        if (indices[it] == -1) {
-            compute(it, true);
+        if(included[it]) {
+            if (indices[it] == -1) {
+                compute(it, true);
+            }
         }
     }
     return SCCbyNum;
@@ -71,7 +84,14 @@ void Tarjan::compute(int v, bool isNumber)
     ++currentIndex;
     S.push(v);
     IsInStack[v] = true;
-    vector<NodeID> outN = G.graph[v];
+    vector<NodeID> outN;
+    for(NodeID it =0; it<G.graph[v].size(); it++)
+    {
+        if(included[it])
+        {
+            outN.push_back(G.graph[v][it]);
+        }
+    }
     for (auto it : outN) {
         if (indices[it] == -1) {
             compute(it, isNumber);
