@@ -68,6 +68,13 @@ public:
 
     void print() const;
     bool DFS(NodeID u, NodeID v);
+    vector<NodeID> GetSources();
+    vector<NodeID> GetSinks();
+
+    // this for the case that we are exluding some vertices
+    vector<NodeID> GetSources(const vector<bool>&);
+    vector<NodeID> GetSinks(const vector<bool>&);
+
     //bool isInLoop(NodeID);
 };
 
@@ -210,6 +217,106 @@ void Graph::deleteVertex(NodeID v)
             }
         }
     }
+}
+
+vector<NodeID> Graph::GetSources()
+{
+    vector<NodeID> srcs;
+    vector<int> indegree(this->GetNumVertices(), 0);
+    for(NodeID v = 0; v<this->GetNumVertices(); v++)
+    {
+        for(NodeID u : this->neighbors(v))
+        {
+            indegree[u]++;
+        }
+    }
+    for(NodeID v = 0; v<this->GetNumVertices(); v++)
+    {
+        if(indegree[v]==0)
+        {
+            srcs.push_back(v);
+        }
+    }
+    return srcs;
+}
+
+
+
+vector<NodeID> Graph::GetSinks()
+{
+    vector<NodeID> sks;
+    for(NodeID v = 0; v< this->GetNumVertices(); v++)
+    {
+        if(this->GetDegree(v)==0)
+        {
+            sks.push_back(v);
+        }
+    }
+    return sks;
+}
+
+vector<NodeID> Graph::GetSources(const vector<bool> & inc) {
+    vector<NodeID> srcs;
+    vector<NodeID> degree(this->GetNumVertices(), -1);
+    for(int it = 0; it<inc.size(); it++)
+    {
+        if(inc[it])
+        {
+            degree[it]=0;
+        }
+    }
+    for(NodeID v = 0; v<this->GetNumVertices(); v++)
+    {
+        if(inc[v]) {
+            for (NodeID u : this->neighbors(v)) {
+                if(inc[u])
+                {
+                    degree[v]++;
+                }
+            }
+        }
+    }
+
+    for(NodeID v = 0; v<this->GetNumVertices(); v++)
+    {
+        if(degree[v]==0)
+        {
+            srcs.push_back(v);
+        }
+    }
+    return srcs;
+}
+
+
+vector<NodeID> Graph::GetSinks(const vector<bool> &inc) {
+    vector<NodeID> sks;
+    vector<int> indegree(this->GetNumVertices(), -1);
+    for (int it = 0; it < this->GetNumVertices(); it++) {
+        if (inc[it]) {
+            indegree[it] = 0;
+        }
+    }
+
+    for (NodeID v = 0; v < this->GetNumVertices(); v++)
+    {
+        if(inc[v]) {
+            for (NodeID u : this->neighbors(v)) {
+                if(inc[u])
+                {
+                    indegree[u]++;
+                }
+            }
+        }
+    }
+
+    for(NodeID v = 0; v<this->GetNumVertices(); v++)
+    {
+        if(indegree[v]==0)
+        {
+            sks.push_back(v);
+        }
+    }
+    return sks;
 }
 
 #endif //BREAKINGCYCLES_GRAPH_H
