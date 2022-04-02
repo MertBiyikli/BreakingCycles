@@ -12,7 +12,8 @@ public:
     Graph G;
     MakeMinimal(Graph& G);
     pair<vector<bool>, int> fvs;
-    pair<vector<bool>, int> Compute();
+    FVS Compute();
+    FVS Compute(vector<bool>& included);
     void reduce();
 };
 
@@ -60,5 +61,8 @@ pair<vector<bool>, int> MakeMinimal::Compute()
     }
     return this->fvs;
 }
+
+
+
 
 #endif //BREAKINGCYCLES_MAKEMINIMAL_H

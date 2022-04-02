@@ -56,23 +56,33 @@ pair<vector<bool>, int> MakeMinimalWithSorting::Compute()
     vector<int> indegree(G.GetNumVertices(), 0);
     for(NodeID v = 0; v<G.GetNumVertices(); v++)
     {
-        for(auto u : G.neighbors(v))
+        for(const auto& u : G.neighbors(v))
         {
             indegree[u]++;
         }
     }
-    vector<pair<int, int> > TotalDegree(G.GetNumVertices());
+
+    priority_queue<pair<NodeID , int> > Q;
     for(NodeID v = 0; v<G.GetNumVertices(); v++)
     {
-        TotalDegree[v]=make_pair(v, indegree[v]+G.GetDegree(v));
+        if(indegree[v]+G.GetDegree(v)<2) {
+            continue;
+        }
+        if(indegree[v]==1 && G.GetDegree(v)==1 && fvs.first[G.graph[v][0]])
+        {
+            continue;
+        }
+        Q.push(make_pair(v, indegree[v] + G.GetDegree(v)));
     }
 
-    sort(TotalDegree.begin(), TotalDegree.end(), [](pair<int, int>& a, pair<int, int>& b){
-        return a.second < b.second;
-    });
-
-    for(auto v_pair : TotalDegree)
+    while(!Q.empty())
     {
+        auto v_pair = Q.top();
+        Q.pop();
+        if(v_pair.first+v_pair.second<2)
+        {
+            continue;
+        }
         NodeID v = v_pair.first;
         if(fvs.first[v]) {
             this->fvs.first[v] = false;

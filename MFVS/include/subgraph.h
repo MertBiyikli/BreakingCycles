@@ -14,6 +14,7 @@ public:
     Graph G;
     map<NodeID , int> M; // the first value: index in original graph; second is index for the subgraph
     Subgraph(Graph& G_, vector<bool>& included);
+    Subgraph(Graph& G_, const NodeID& v);
     //Subgraph(Graph& G_, vector<bool>& included, bool merged);
     pair<Graph, map<NodeID, int> > GetSubGraph();
 };
@@ -58,6 +59,27 @@ Subgraph::Subgraph(Graph &G_, vector<bool> &included) {
             }
         }
     }
+
+Subgraph::Subgraph(Graph &G_, const NodeID &v)
+{
+    this->G = G_;
+    for(NodeID it = 0; it<G.GetNumVertices(); it++)
+    {
+        if(it == v)
+        {
+            G.graph.erase(G.graph.begin()+it);
+            continue;
+        }
+        for(NodeID jt = 0; jt<G.graph[it].size(); jt++)
+        {
+            NodeID u = G.graph[it][jt];
+            if(u==v)
+            {
+                G.graph[it].erase(G.graph[it].begin()+jt);
+            }
+        }
+    }
+}
 /*
 Subgraph::Subgraph(Graph &G_, vector<bool> &included, bool merged)
 {
