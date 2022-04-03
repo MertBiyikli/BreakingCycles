@@ -6,6 +6,13 @@ This is a implemenation for the PACE 2022 for solving the Minimum Directed Feedb
 
 *This is currently under developement. If you are interested in the result, check back in a few months.*
 
+# Prerequisites
+
+Building the BreakingCycle API requires the following software installed:
+
+* A C++11-compliant compiler
+* CMake `>= 3.9`
+
 The following sequence of commands downloads and builds the BreakingCycle:
 
 ```

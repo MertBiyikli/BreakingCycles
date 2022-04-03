@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.17)
 project(BreakingCycles)
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include_directories(MFVS/include)
 include_directories(MFVS/heuristic)
