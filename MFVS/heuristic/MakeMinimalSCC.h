@@ -25,7 +25,8 @@ MakeMinimalSCC::MakeMinimalSCC(Graph &G)
 
 FVS MakeMinimalSCC::Compute() {
     Tarjan T(G);
-    FVS fvs = make_pair(vector<bool>(G.GetNumVertices(), false), 0);
+    FVS fvs = make_pair(vector<bool>(G.GetNumVertices(), true), G.GetNumVertices());
+    vector<NodeID> Candidate;
     auto SCC = T.getSCC();
     for (auto scc : SCC)
     {
@@ -33,16 +34,28 @@ FVS MakeMinimalSCC::Compute() {
         {
             for(auto v : scc)
             {
-                fvs.first[v]=true;
-                fvs.second++;
+                Candidate.push_back(v);
+            }
+        }
+        if(scc.size()==1)
+        {
+            for(auto v : scc)
+            {
+                fvs.first[v]=false;
+                fvs.second--;
             }
         }
     }
-    for(auto scc : SCC)
+    for(auto& v : Candidate)
     {
-        if(scc.size()>1)
-        {
-
+        if(fvs.first.at(v)) {
+            fvs.first[v] = false;
+            if (isAcyclic(G, fvs.first)) {
+                fvs.first[v] = false;
+                fvs.second--;
+            } else {
+                fvs.first[v] = true;
+            }
         }
     }
     return fvs;
