@@ -16,7 +16,7 @@ Building the BreakingCycle API requires the following software installed:
 The following sequence of commands downloads and builds the BreakingCycle:
 
 ```
-git clone --recursive https://github.com/MertBiyikli/BreakingCycles.git
+git clone https://github.com/MertBiyikli/BreakingCycles.git
 cd BreakingCycle
 mkdir build
 cd build
