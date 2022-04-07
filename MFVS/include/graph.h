@@ -75,6 +75,17 @@ public:
     vector<NodeID> GetSources(const vector<bool>&);
     vector<NodeID> GetSinks(const vector<bool>&);
 
+
+    //for in and outgoing neighbours
+    vector<NodeID> InGoing(NodeID v, const vector<bool>& inc);
+    vector<NodeID> OutGoing(NodeID v, const vector<bool>& inc);
+
+
+    vector<NodeID> InGoing(NodeID v);
+    vector<NodeID> OutGoing(NodeID v);
+
+    int GetDegree(NodeID n, const vector<bool>& inc) const;
+
     //bool isInLoop(NodeID);
 };
 
@@ -160,6 +171,53 @@ bool isAcyclic(const Graph& graph, const std::vector<bool>& fvs) {
             --in_degree[v];
             if ( !fvs[v] && in_degree[v] == 0 ) {
                 q.push(v);
+            }
+        }
+    }
+
+    return visited_nodes == (graph.GetNumVertices() - fvs_size);
+}
+
+
+
+bool isAcyclic(const Graph& graph, const std::vector<bool>& fvs, const vector<bool>& inc) {
+    int fvs_size = 0;
+    for ( size_t i = 0; i < fvs.size(); ++i ) {
+        fvs_size += fvs[i];
+    }
+
+    std::vector<int> in_degree(graph.GetNumVertices(), 0);
+    for ( int u = 0; u < graph.GetNumVertices(); u++ ) {
+        if(inc[u]) {
+            if (!fvs[u]) {
+                for (const int v : graph.neighbors(u)) {
+                    ++in_degree[v];
+                }
+            }
+        }
+    }
+
+    std::queue<int> q;
+    for ( int u = 0; u < graph.GetNumVertices(); ++u ) {
+        if(inc[u]) {
+            if (!fvs[u] && in_degree[u] == 0) {
+                q.push(u);
+            }
+        }
+    }
+
+    int visited_nodes = 0;
+    while ( !q.empty() ) {
+        int u = q.front();
+        q.pop();
+        ++visited_nodes;
+
+        for ( const int v : graph.neighbors(u) ) {
+            if (inc[v]) {
+                --in_degree[v];
+                if (!fvs[v] && in_degree[v] == 0) {
+                    q.push(v);
+                }
             }
         }
     }
@@ -317,6 +375,81 @@ vector<NodeID> Graph::GetSinks(const vector<bool> &inc) {
         }
     }
     return sks;
+}
+
+vector<NodeID> Graph::InGoing(NodeID _v_, const vector<bool> &inc)
+{
+    vector<NodeID> ingoing;
+    for(NodeID v = 0; v<this->GetNumVertices(); v++)
+    {
+        if(inc[v]) {
+            for (NodeID u : this->neighbors(v)) {
+                if(inc[u])
+                {
+                    if(u == _v_)
+                    {
+                        ingoing.push_back(v);
+                    }
+                }
+            }
+        }
+    }
+    return ingoing;
+}
+
+
+vector<NodeID> Graph::InGoing(NodeID _v_)
+{
+    vector<NodeID> ingoing;
+    for(NodeID v = 0; v<this->GetNumVertices(); v++)
+    {
+            for (NodeID u : this->neighbors(v))
+                {
+                    if(u == _v_)
+                    {
+                        ingoing.push_back(v);
+                    }
+                }
+            }
+    return ingoing;
+}
+
+
+vector<NodeID> Graph::OutGoing(NodeID v, const vector<bool> &inc)
+{
+    vector<NodeID> outgoing;
+    for(NodeID u : this->neighbors(v))
+    {
+        if(inc[u])
+        {
+            outgoing.push_back(u);
+        }
+    }
+    return outgoing;
+}
+
+
+vector<NodeID> Graph::OutGoing(NodeID v)
+{
+    vector<NodeID> outgoing;
+    for(NodeID u : this->neighbors(v))
+    {
+        outgoing.push_back(u);
+    }
+    return outgoing;
+}
+
+
+int Graph::GetDegree(NodeID n, const vector<bool>& inc) const {
+    int Degree = 0;
+    for(NodeID u : this->neighbors(n))
+    {
+        if(inc[u])
+        {
+            Degree++;
+        }
+    }
+    return Degree;
 }
 
 #endif //BREAKINGCYCLES_GRAPH_H

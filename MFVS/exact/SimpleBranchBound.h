@@ -7,6 +7,7 @@
 
 #include "../include/graph.h"
 #include "../heuristic/MakeMinimalWithSorting.h"
+#include "../algorithms/SCC.h"
 
 #define REMOVED -1
 #define UNTOUCHED 0
@@ -17,30 +18,40 @@
 class BranchBound{
 public:
     Graph G_;
+    int lowerbound, upperbound;
     BranchBound(Graph& G);
-    vector<NodeID> BandB(Graph& G);
+    FVS BandB(Graph& G, bool print);
     void heuristic(Graph& G, vector<NodeID>& best, int& bestCard);
-    bool coreBfvsB(Graph& G, vector<NodeID>& inc, vector<NodeID>& best, int& bestCard);
+    bool coreBfvsB(Graph& G, vector<NodeID>& inc, vector<NodeID>& best, int& bestCard, bool print);
     bool findCycle(Graph& G, vector<NodeID>& inc, vector<NodeID>& cycle);
     bool DFS_FindingCycle(Graph& G, NodeID v, vector<NodeID>& parent, vector<int>& status, int& c);
+    void lowerBound(Graph& G, vector<NodeID>& best, int& bestCard);
 };
 
 BranchBound::BranchBound(Graph &G)
 {
     this->G_ = G;
+    this->lowerbound = Tarjan(G).getSCC().size();
 }
 
-vector<NodeID> BranchBound::BandB(Graph &G_)
+FVS BranchBound::BandB(Graph &G_, bool print )
 {
     vector<NodeID> removed;
     vector<NodeID> best;
     int bestcard;
     this->heuristic(G_, best, bestcard);
-    this->coreBfvsB(G_, removed, best, bestcard);
-    return best;
+    this->lowerBound(G_, best, bestcard);
+    this->coreBfvsB(G_, removed, best, bestcard, print);
+    FVS fvs = make_pair(vector<bool>(G_.GetNumVertices(), false), 0);
+    for(auto it : best)
+    {
+        fvs.first[it]=true;
+        fvs.second++;
+    }
+    return fvs;
 }
 
-void BranchBound::heuristic(Graph &G, vector<NodeID> &best, int& bestCard) {
+void BranchBound::heuristic(Graph &G, vector<NodeID> &best, int& bestCard) {/*
     vector<NodeID> removed;
     vector<NodeID> cycle;
     while(this->findCycle(G, removed, cycle))
@@ -48,7 +59,7 @@ void BranchBound::heuristic(Graph &G, vector<NodeID> &best, int& bestCard) {
         removed.push_back(cycle[0]);
     }
     best = removed;
-    bestCard = removed.size();/*
+    bestCard = removed.size();*/
     MakeMinimalWithSorting M(G);
     auto fvs = M.Compute();
     for(NodeID i = 0; i<fvs.first.size(); i++)
@@ -58,7 +69,37 @@ void BranchBound::heuristic(Graph &G, vector<NodeID> &best, int& bestCard) {
             best.push_back(i);
         }
     }
-    bestCard = fvs.second;*/
+    this->upperbound = fvs.second;
+    bestCard = fvs.second;
+}
+
+
+void BranchBound::lowerBound(Graph &G, vector<NodeID> &best, int &bestCard)
+{
+    Graph g = G;
+    vector<bool> tmp(g.GetNumVertices(), true);
+    size_t lb = 0;
+    while (true) {
+        auto cycles = Cycle(g, tmp).GetCycles();
+        if (cycles.empty())
+            break;
+        for (auto& cycle : cycles) {
+            bool doneAlready = false;
+            for (NodeID u : cycle) {
+                if (!tmp[u]) {
+                    doneAlready = true;
+                    break;
+                }
+            }
+            if (doneAlready)
+                continue;
+            for (NodeID u : cycle){
+                tmp[u]=false;
+            }
+            ++lb;
+        }
+    }
+    this->lowerbound = lb;
 }
 
 bool BranchBound::findCycle(Graph &G, vector<NodeID> &inc, vector<NodeID> &cycle)
@@ -122,10 +163,17 @@ bool BranchBound::DFS_FindingCycle(Graph &G, NodeID v, vector<NodeID> &parent, v
 
 int ctr = 0;
 
-bool BranchBound::coreBfvsB(Graph &G, vector<NodeID> &inc, vector<int> &best, int& bestCard) {
+bool BranchBound::coreBfvsB(Graph &G, vector<NodeID> &inc, vector<int> &best, int& bestCard, bool print) {
+    if(print)
+    {
+        cout << "---------------------------" << endl;
+        cout << "bestCard: " << bestCard << endl;
+        cout << "lowerbound: " << lowerbound << endl;
+        cout << "upperbound: " << upperbound << endl;
+        cout << "---------------------------" << endl;
+    }
     vector<NodeID> cycle;
     bool timeout = false;
-    cout << bestCard << endl;
     if (inc.size() == bestCard)
     {
         return false;
@@ -135,7 +183,7 @@ bool BranchBound::coreBfvsB(Graph &G, vector<NodeID> &inc, vector<int> &best, in
         for(auto& node : cycle)
         {
             inc.push_back(node);
-            timeout = this->coreBfvsB(G, inc, best, bestCard);
+            timeout = this->coreBfvsB(G, inc, best, bestCard, print);
             inc.pop_back();
             if(timeout)
             {

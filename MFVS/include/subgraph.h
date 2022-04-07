@@ -23,7 +23,7 @@ Subgraph::Subgraph(Graph &G_, vector<bool> &included) {
     int ctr = 0;
     for (int I=0; I<included.size(); I++) {
         if (included[I]) {
-            M.insert({I, ctr});
+            M.insert(make_pair(I, ctr));
             ctr++;
         }
     }
@@ -80,40 +80,6 @@ Subgraph::Subgraph(Graph &G_, const NodeID &v)
         }
     }
 }
-/*
-Subgraph::Subgraph(Graph &G_, vector<bool> &included, bool merged)
-{
-
-
-
-
-
-    for(NodeID v = 0; v<G.GetNumVertices(); v++) {
-        vector<NodeID> InComingNeig;
-        vector<NodeID> OutGoing = G.graph[maxV.first];
-        for (NodeID v = 0; v < G.GetNumVertices(); v++) {
-            for (auto u : G.neighbors(v)) {
-                if (u == maxV.first) {
-                    InComingNeig.push_back(v);
-                }
-            }
-        }
-        Graph rightGraph = Subgraph(G, left).GetSubGraph().first;
-        for (NodeID In : InComingNeig) {
-            for (NodeID Out : OutGoing) {
-                bool EdgeExists = false;
-                for (auto it : rightGraph.graph[In]) {
-                    if (it == Out) {
-                        EdgeExists = true;
-                    }
-                }
-                if (!EdgeExists) {
-                    rightGraph.graph[In].push_back(Out);
-                }
-            }
-        }
-    }
-}*/
 
 pair<Graph, map<NodeID, int> >  Subgraph::GetSubGraph()
 {
