@@ -20,7 +20,7 @@ public:
     pair<vector<bool>, int> Compute();
 };
 
-pair<vector<bool>, int> SCCRandom::Compute() // TODO: try to fix this, the idea is good and might be very fast
+pair<vector<bool>, int> SCCRandom::Compute()
 {
     auto SCC = T.getSCC();
     this->fvs.first.resize(G.GetNumVertices(), false);

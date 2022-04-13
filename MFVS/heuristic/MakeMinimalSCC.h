@@ -28,7 +28,7 @@ FVS MakeMinimalSCC::Compute() {
     FVS fvs = make_pair(vector<bool>(G.GetNumVertices(), true), G.GetNumVertices());
     vector<NodeID> Candidate;
     auto SCC = T.getSCC();
-    for (auto scc : SCC)
+    for (const auto& scc : SCC)
     {
         if(scc.size()>1)
         {
@@ -46,7 +46,7 @@ FVS MakeMinimalSCC::Compute() {
             }
         }
     }
-    for(auto& v : Candidate)
+    for(const auto& v : Candidate)
     {
         if(fvs.first.at(v)) {
             fvs.first[v] = false;

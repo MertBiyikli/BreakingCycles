@@ -33,7 +33,6 @@ MakeMinimalSCCWithSorting::MakeMinimalSCCWithSorting(Graph &G)
 
 using namespace std;
 
-typedef pair<int, int> pd;
 
 struct myComp {
     constexpr bool operator()(
