@@ -82,6 +82,13 @@ int ReadGraph(const std::string& file, Graph& G) {
         std::cerr << "The number of edges dont match the number of edges read" << std::endl;
         return -1;
     }
+    for(NodeID v = 0; v<G.GetNumVertices(); v++)
+    {
+        for(NodeID u : G.neighbors(v))
+        {
+            G.edges.push_back(Edge{v, u});
+        }
+    }
     return 0;
 }
 

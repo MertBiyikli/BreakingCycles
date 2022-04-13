@@ -46,6 +46,11 @@ private:
     IteratorT __begin, __end;
 };
 
+struct Edge{
+    Edge(NodeID v, NodeID u){this->v = v; this->u = u;};
+    NodeID u, v;
+};
+
 class Graph
 {
     using NeighborIterator = typename std::vector<int>::const_iterator;
@@ -85,6 +90,8 @@ public:
     vector<NodeID> OutGoing(NodeID v);
 
     int GetDegree(NodeID n, const vector<bool>& inc) const;
+
+    vector<Edge> edges;
 
     //bool isInLoop(NodeID);
 };
@@ -281,12 +288,9 @@ vector<NodeID> Graph::GetSources()
 {
     vector<NodeID> srcs;
     vector<int> indegree(this->GetNumVertices(), 0);
-    for(NodeID v = 0; v<this->GetNumVertices(); v++)
+    for(auto e : this->edges)
     {
-        for(NodeID u : this->neighbors(v))
-        {
-            indegree[u]++;
-        }
+        indegree[e.u]++;
     }
     for(NodeID v = 0; v<this->GetNumVertices(); v++)
     {
@@ -315,29 +319,23 @@ vector<NodeID> Graph::GetSinks()
 
 vector<NodeID> Graph::GetSources(const vector<bool> & inc) {
     vector<NodeID> srcs;
-    vector<NodeID> degree(this->GetNumVertices(), -1);
+    vector<NodeID> indegree(this->GetNumVertices(), -1);
     for(int it = 0; it<inc.size(); it++)
     {
         if(inc[it])
         {
-            degree[it]=0;
+            indegree[it]=0;
         }
     }
-    for(NodeID v = 0; v<this->GetNumVertices(); v++)
-    {
-        if(inc[v]) {
-            for (NodeID u : this->neighbors(v)) {
-                if(inc[u])
-                {
-                    degree[v]++;
-                }
-            }
+    for(auto e : edges) {
+        if (inc[e.u] && inc[e.v]) {
+            indegree[e.u]++;
         }
     }
 
     for(NodeID v = 0; v<this->GetNumVertices(); v++)
     {
-        if(degree[v]==0)
+        if(indegree[v]==0)
         {
             srcs.push_back(v);
         }
@@ -348,28 +346,26 @@ vector<NodeID> Graph::GetSources(const vector<bool> & inc) {
 
 vector<NodeID> Graph::GetSinks(const vector<bool> &inc) {
     vector<NodeID> sks;
-    vector<int> indegree(this->GetNumVertices(), -1);
-    for (int it = 0; it < this->GetNumVertices(); it++) {
-        if (inc[it]) {
-            indegree[it] = 0;
+    vector<int> outdegree(this->GetNumVertices(), -1);
+    for(NodeID v = 0; v<GetNumVertices(); v++)
+    {
+        if(inc[v])
+        {
+            outdegree[v]=0;
         }
     }
 
-    for (NodeID v = 0; v < this->GetNumVertices(); v++)
+    for(auto e : edges)
     {
-        if(inc[v]) {
-            for (NodeID u : this->neighbors(v)) {
-                if(inc[u])
-                {
-                    indegree[u]++;
-                }
-            }
+        if(inc[e.v] && inc[e.u])
+        {
+            outdegree[e.v]++;
         }
     }
 
     for(NodeID v = 0; v<this->GetNumVertices(); v++)
     {
-        if(indegree[v]==0)
+        if(outdegree[v]==0)
         {
             sks.push_back(v);
         }
