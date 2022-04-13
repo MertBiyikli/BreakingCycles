@@ -41,7 +41,7 @@ Tarjan::Tarjan(Graph &G, vector<bool> &vec)
     this->included=vec;
 }
 
-vector<vector<int>> Tarjan::getSCC() {
+vector<vector<int> > Tarjan::getSCC() {
     currentIndex = 0;
     this->indices.resize(G.GetNumVertices(), -1);
     this->ancestors.resize(G.GetNumVertices());
@@ -85,11 +85,11 @@ void Tarjan::compute(int v, bool isNumber)
     S.push(v);
     IsInStack[v] = true;
     vector<NodeID> outN;
-    for(NodeID it =0; it<G.graph[v].size(); it++)
+    for(/*NodeID it =0; it<G.graph[v].size(); it++)*/ NodeID it : G.neighbors(v))
     {
         if(included[it])
         {
-            outN.push_back(G.graph[v][it]);
+            outN.push_back(it);
         }
     }
     for (auto it : outN) {
