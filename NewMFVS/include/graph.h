@@ -10,6 +10,7 @@
 #include <iostream>
 #include <queue>
 #include <stack>
+#include <list>
 
 
 using namespace std;
@@ -70,6 +71,8 @@ public:
     vector<vector<NodeID> > SCC();
     vector<NodeID> SCC_component();
     Graph GroundingKernel();
+    vector<NodeID> shortestCycle();
+    vector<int> _shortestCycle(int vertex, int maxLength);
     //vector<NodeID> shortestCycle();
     //vector<NodeID> _shortestCycle(NodeID v, int maxLength);
     bool isAcyclic_;
@@ -88,7 +91,6 @@ public:
     vector<Edge> acyclicEdges();
     vector<Edge> piEdges();
     vector<Edge> pseudoAcyclicEdges();
-    bool isPieVertex(NodeID v) const;
     vector<NodeID> PieVertcices();
     bool isClique(vector<NodeID>& nodes);
     vector<NodeID> Core();
@@ -99,12 +101,22 @@ public:
     bool isDominated(const Edge& e) const;
     vector<Edge> GetDominatedEdges();
     vector<vector<NodeID> > getstronglyconnectedcomponents();
+    vector<NodeID> vertexToStronglyConnectedComponentNumber();
 
     // RemovalMethods
     vector<Edge> pie();
-    vector<Edge> dome;
+    bool isPiVertex(NodeID vertex);
+    vector<Edge> dome();
+    vector<NodeID> core();
+    vector<int> piPredecessors(int vertex);
+    vector<int> piSuccessors(int vertex);
+    vector<int> nonPiPredecessors(int vertex);
+    vector<NodeID> nonPiSuccessors(int vertex);
+    bool isDominated(int source, int target);
+    vector<Edge> dominatedEdges();
 
-    vector<NodeID> reduce(bool, bool, bool, bool, bool, bool, bool, bool, bool, bool);
+
+    vector<NodeID> reduce(bool, bool, bool, bool, bool, bool, bool, bool, bool);
     vector<NodeID> reduce(bool);
 
     void print();
@@ -384,6 +396,20 @@ pair<NodeID , int> Graph::MaxTotalDegree() const {
     return max;
 }
 
+pair<NodeID , int> Graph::MinTotalDegree() const {
+    pair<NodeID, int> min(0,numeric_limits<int>::max());
+    for(auto v : vertices)
+    {
+        if(hasVertex(v)) {
+            if (OutDegree(v)+Indegree(v) < min.second) {
+                min.first = v;
+                min.second = Indegree(v);
+            }
+        }
+    }
+    return min;
+}
+
 bool Graph::isSinkNode(NodeID v) {
     if(hasVertex(v))
     {
@@ -513,18 +539,160 @@ vector<NodeID> Graph::In1() {
     } else
         return vector<int>();
 }
-/*
+
+
+bool Graph::isPiVertex(int vertex) {
+    vector<int> outN = OutGoing(vertex);
+    bool valid = true;
+    vector<int>::iterator it = outN.begin();
+    while (valid && it != outN.end()) {
+        valid = hasEdge(*it, vertex);
+        ++it;
+    }
+    return valid;
+}
+
+vector<int> Graph::PieVertcices() {
+    vector<int> vs;
+    for (set<int>::iterator it = GetVertices().begin(); it != GetVertices().end(); ++it) {
+        if (isPiVertex(*it)) vs.push_back(*it);
+    }
+    return vs;
+}
+
+vector<NodeID> Graph::core() {
+    if (int(loops().size()) == 0) {
+        vector<int> piVs = PieVertcices();
+        for (vector<int>::iterator it = piVs.begin(); it != piVs.end(); ++it) {
+            vector<int> potentialClique = OutGoing(*it);
+            potentialClique.push_back(*it);
+            if (isClique(potentialClique)) {
+                DeleteVertices(potentialClique);
+                potentialClique.pop_back();
+                return potentialClique;
+            }
+        }
+    }
+    return vector<int>();
+}
+
+vector<int> Graph::piPredecessors(int vertex) {
+    vector<int> piPreds;
+    vector<int> preds = InComingNodes(vertex);
+    for (vector<int>::iterator it = preds.begin(); it != preds.end(); ++it)
+        if (hasEdge(vertex, *it)) piPreds.push_back(*it);
+    return piPreds;
+}
+
+vector<int> Graph::piSuccessors(int vertex) {
+    vector<int> piSucc;
+    vector<int> succ = OutGoing(vertex);
+    for (vector<int>::iterator it = succ.begin(); it != succ.end(); ++it)
+        if (hasEdge(*it, vertex)) piSucc.push_back(*it);
+    return piSucc;
+}
+
+vector<int> Graph::nonPiPredecessors(int vertex)  {
+    vector<int> nonPiPreds;
+    vector<int> preds = InComingNodes(vertex);
+    for (vector<int>::iterator it = preds.begin(); it != preds.end(); ++it)
+        if (!hasEdge(vertex, *it)) nonPiPreds.push_back(*it);
+    return nonPiPreds;
+}
+
+vector<int> Graph::nonPiSuccessors(int vertex) {
+    vector<int> nonPiSucc;
+    vector<int> succ = OutGoing(vertex);
+    for (vector<int>::iterator it = succ.begin(); it != succ.end(); ++it)
+        if (!hasEdge(*it, vertex)) nonPiSucc.push_back(*it);
+    return nonPiSucc;
+}
+
+bool Graph::isDominated(int source, int target)  {
+    if (!hasEdge(source, target)) return false;
+    else if (hasEdge(source, target) && hasEdge(target, source)) return false;
+    else {
+        vector<int> pTarget = InComingNodes(target);
+        vector<int> pSource = nonPiPredecessors(source);
+        sort(pTarget.begin(), pTarget.end());
+        sort(pSource.begin(), pSource.end());
+        if (includes(pTarget.begin(), pTarget.end(), pSource.begin(), pSource.end()))
+            return true;
+        vector<int> sSource = OutGoing(source);
+        vector<int> sTarget = nonPiSuccessors(target);
+        sort(sSource.begin(), sSource.end());
+        sort(sTarget.begin(), sTarget.end());
+        if (includes(sSource.begin(), sSource.end(), sTarget.begin(), sTarget.end()))
+            return true;
+        else
+            return false;
+    }
+}
+
+vector<Edge> Graph::dominatedEdges()  {
+    vector<Edge> allEdges = GetEdges();
+    vector<Edge> des;
+    for (vector<Edge>::iterator it = allEdges.begin(); it != allEdges.end(); ++it)
+        if (isDominated(it->u, it->v)) des.push_back(*it);
+    return des;
+}
+
+vector<Edge> Graph::dome() {
+    if (int(loops().size()) == 0) {
+        vector<Edge> des = dominatedEdges();
+        DeleteEdges(des);
+        return des;
+    } else
+        return vector<Edge>();
+}
+
+vector<Edge> Graph::pie() {
+    if (int(loops().size()) == 0) {
+        vector<Edge> aes = acyclicEdges();
+        vector<Edge> paes = pseudoAcyclicEdges();
+        DeleteEdges(aes);
+        DeleteEdges(paes);
+        vector<Edge> es(aes);
+        for (vector<Edge>::iterator it = paes.begin(); it != paes.end(); ++it) {
+            es.push_back(*it);
+        }
+        return es;
+    } else
+        return vector<Edge>();
+}
+
+
 vector<Edge> Graph::acyclicEdges() {
     vector<Edge> ae;
     vector<Edge> allEdges = this->GetEdges();
     vector<int> vertexToSCC = vertexToStronglyConnectedComponentNumber();
     for (vector<Edge>::iterator it = allEdges.begin(); it != allEdges.end(); ++it) {
-        if (vertexToSCC[it->source] != vertexToSCC[it->target]) {
+        if (vertexToSCC[it->u] != vertexToSCC[it->v]) {
             ae.push_back(*it);
         }
     }
     return ae;
-}*/
+}
+
+vector<Edge> Graph::pseudoAcyclicEdges() {
+    Graph h(*this);
+    vector<Edge> pies = piEdges();
+    auto acyc = acyclicEdges();
+    h.DeleteEdges(acyc);
+    h.DeleteEdges(pies);
+    return h.acyclicEdges();
+}
+
+vector<Edge> Graph::piEdges() {
+    vector<Edge> es;
+    vector<Edge> allEdges = GetEdges();
+    for (vector<Edge>::iterator it = allEdges.begin(); it != allEdges.end(); ++it) {
+        if (hasEdge(it->u, it->v)) {
+            es.push_back(*it);
+        }
+    }
+    return es;
+}
 
 
 bool Graph::isClique(vector<NodeID> &nodes) {
@@ -548,7 +716,7 @@ vector<NodeID> Graph::reduce(bool print=false) {
         n = GetNumVertices();
         m = GetNumEdges();
         vector<int> partialSolution = reduce(true, true, true, true, true,
-                                             false, false, false, false, print);
+                                             false, false, true, print);
         for (vector<int>::iterator it = partialSolution.begin();
              it != partialSolution.end(); ++it)
             solution.push_back(*it);
@@ -556,7 +724,7 @@ vector<NodeID> Graph::reduce(bool print=false) {
     return solution;
 }
 
-vector<NodeID> Graph::reduce(bool out0, bool in0, bool out1, bool in1, bool loop, bool r6, bool r7, bool r8, bool r9, bool print) {
+vector<NodeID> Graph::reduce(bool out0, bool in0, bool out1, bool in1, bool loop, bool applyPie, bool applyCore, bool applyDome, bool print) {
     vector<int> solution;
     if (in0) {
         vector<int> in0Vertices = In0();
@@ -584,7 +752,7 @@ vector<NodeID> Graph::reduce(bool out0, bool in0, bool out1, bool in1, bool loop
         vector<int> out1Vertices = Out1();
         if (print) cout << "OUT1 : " << int(out1Vertices.size())
                           << " vertex(vertices) has(have) been merged." << endl;
-    }/*
+    }
     if (applyPie) {
         vector<Edge> pieEdges = pie();
         if (print) cout << "PIE  : " << int(pieEdges.size())
@@ -601,7 +769,7 @@ vector<NodeID> Graph::reduce(bool out0, bool in0, bool out1, bool in1, bool loop
         vector<Edge> domeEdges = dome();
         if (print) cout << "DOME : " << int(domeEdges.size())
                           << " edge(s) has(have) been removed." << endl;
-    }*/
+    }
     return solution;
 }
 
@@ -621,6 +789,24 @@ vector<vector<NodeID>> Graph::getstronglyconnectedcomponents() {
         if (_tarjanIndex[*it] == -1) _tarjan(*it, false);
     }
     return _sccs;
+}
+
+vector<NodeID> Graph::vertexToStronglyConnectedComponentNumber() {
+    _tarjanCurrentIndex = 0;
+    _tarjanIndex = vector<int>(currentMax);
+    _tarjanAncestor = vector<int>(currentMax);
+    _tarjanStack = stack<int>();
+    _tarjanInStack = vector<bool>(currentMax);
+    _currentComponent = 0;
+    _sccsByNum = vector<int>(currentMax);
+    for (int i = 0; i < currentMax; ++i) {
+        _tarjanIndex[i] = -1;
+        _tarjanInStack[i] = false;
+    }
+    for (set<int>::iterator it = GetVertices().begin(); it != GetVertices().end(); ++it) {
+        if (_tarjanIndex[*it] == -1) _tarjan(*it, true);
+    }
+    return _sccsByNum;
 }
 
 
@@ -668,6 +854,78 @@ bool Graph::isAcyclic() {
            int(getstronglyconnectedcomponents().size()) == GetNumVertices();
 }
 
+
+vector<NodeID> Graph::shortestCycle() {
+    Graph h(*this);
+    if (h.isAcyclic()) {
+        throw "No shortest cycle ! This graph is acyclic";
+    } else {
+        int n;
+        do {
+            n = h.GetNumVertices();
+            h.In0();
+            h.Out0();
+            //cout << n << "/" << h.GetNumVertices() << endl;
+        } while (n != h.GetNumVertices());
+        vector<int> shortestCycle;
+        vector<int> currentCycle;
+        int maxLength = h.GetNumVertices();
+        for (set<int>::iterator it = GetVertices().begin(); it != GetVertices().end(); ++it) {
+            if(h.hasVertex(*it))
+            {
+                //cout << "It has this vertex" << endl;
+                currentCycle = h._shortestCycle(*it, maxLength);
+                if (int(currentCycle.size() - 1)  < maxLength) {
+                    shortestCycle = currentCycle;
+                    maxLength = int(currentCycle.size()) - 1;
+                }
+            }else{
+                continue;
+            }/*
+            currentCycle = h._shortestCycle(*it, maxLength);
+            if (int(currentCycle.size() - 1)  < maxLength) {
+                shortestCycle = currentCycle;
+                maxLength = int(currentCycle.size()) - 1;
+            }*/
+        }
+        return shortestCycle;
+    }
+}
+
+vector<int> Graph::_shortestCycle(int vertex, int maxLength) {
+    //cout << "_shortestCycle" << endl;
+    queue< list<int> > paths;
+    list<int> path;
+    path.push_back(vertex);
+    paths.push(path);
+    bool cycleFound = false;
+    //cout << "Just before the while" << endl;
+    while (!cycleFound && !paths.empty()) {
+        path = paths.front();
+      //  cout << "path = paths.front();" << endl;
+        paths.pop();
+        //  cout << "paths.pop();" << endl;
+        cycleFound = int(path.size()) > 1 && path.front() == path.back();
+        //cout << "cycleFound = int(path.size()) > 1 && path.front() == path.back();" << endl;
+        if (!cycleFound && int(path.size()) - 1 < maxLength) {
+            //  cout << "if (!cycleFound && int(path.size()) - 1 < maxLength) {" << endl;
+            //cout << path.back() << endl;
+            //cout << (this->hasVertex(path.back()) ? "Yes" : "No") << endl;
+            vector<int> outN = OutGoing(path.back());
+            //cout << outN.size() << endl;
+            //cout << "vector<int> outN = OutGoing(path.back());" << endl;
+            for (vector<int>::const_iterator it = outN.begin();
+                 it != outN.end(); ++it) {
+                path.push_back(*it);
+                paths.push(path);
+                path.pop_back();
+            }
+        }
+    }
+    vector<int> cycle(int(path.size()));
+    copy(path.begin(), path.end(), cycle.begin());
+    return cycle;
+}
 
 
 bool isAcyclic(Graph& graph, const std::vector<bool>& fvs) {
