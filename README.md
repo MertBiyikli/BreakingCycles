@@ -8,7 +8,7 @@ This is a implemenation for the PACE 2022 for solving the Minimum Directed Feedb
 
 # Prerequisites
 
-Building the BreakingCycle API requires the following software installed:
+Building BreakingCycle requires the following software installed:
 
 * A C++11-compliant compiler
 * CMake `>= 3.1`
