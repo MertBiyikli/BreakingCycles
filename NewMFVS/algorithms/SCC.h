@@ -8,6 +8,10 @@
 #include "../include/graph.h"
 #include <stack>
 
+
+/*
+ * implementation of the Tarjan Algorithm for computing the SCC´s
+ */
 class Tarjan{
 private:
     Graph G;

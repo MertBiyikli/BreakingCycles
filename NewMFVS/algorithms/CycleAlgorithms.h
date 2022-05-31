@@ -22,6 +22,10 @@ public:
 
 Cycle::Cycle(Graph &G) {this->G =G;};
 
+
+/*
+ * Computing the shortest cycle of a given graph
+ */
 vector<NodeID> Cycle::GetShortestCycle(Graph &G_, NodeID s) {
     Graph h = G_;
     if(!h.hasVertex(s))
@@ -61,6 +65,10 @@ vector<NodeID> Cycle::GetShortestCycle(Graph &G_, NodeID s) {
     return {};
 }
 
+/*
+ * To compute the amount of disjoint cycles in a graph. Two cycle are disjoint, if they do not share any common
+ * vertex
+ */
 vector<vector<NodeID>> Cycle::GetDisjointCycle(Graph &G_) {
     Graph H =G_;
     vector<vector<NodeID> > DisjointCyles;

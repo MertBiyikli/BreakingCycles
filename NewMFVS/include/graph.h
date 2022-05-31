@@ -24,7 +24,7 @@ public:
 };
 
 class Graph{
-    vector<vector<NodeID>> OutGoingVertices, InGoingVertices;
+    vector<vector<NodeID> > OutGoingVertices, InGoingVertices;
     set<NodeID> vertices;
     vector<bool> hasVertices;
 
@@ -62,8 +62,8 @@ public:
     pair<NodeID , int> MaxOutdegree() const;
     pair<NodeID , int> MaxTotalDegree() const;
     pair<NodeID , int> MinTotalDegree() const;
-    bool isSourceNode(NodeID v);
-    bool isSinkNode(NodeID v);
+    bool isSourceNode(NodeID v) const;
+    bool isSinkNode(NodeID v) const;
     bool hasSelfLoop(NodeID v) const;
     vector<NodeID> GetSources();
     vector<NodeID> GetSinks();
@@ -199,6 +199,8 @@ vector<NodeID> & Graph::OutGoing(NodeID v) {
     }
 }
 
+
+//for debugging purposes only
 void Graph::print() {
     for(auto v : vertices)
     {
@@ -410,7 +412,7 @@ pair<NodeID , int> Graph::MinTotalDegree() const {
     return min;
 }
 
-bool Graph::isSinkNode(NodeID v) {
+bool Graph::isSinkNode(NodeID v) const {
     if(hasVertex(v))
     {
         if(OutDegree(v)==0)
@@ -421,7 +423,7 @@ bool Graph::isSinkNode(NodeID v) {
     return false;
 }
 
-bool Graph::isSourceNode(NodeID v) {
+bool Graph::isSourceNode(NodeID v) const {
     if(hasVertex(v))
     {
         if(Indegree(v)==0)
@@ -521,7 +523,7 @@ vector<NodeID> Graph::Out1() {
         }
         return out1Vertices;
     } else
-        return {};
+        return vector<NodeID>();
 }
 
 vector<NodeID> Graph::In1() {
@@ -774,7 +776,7 @@ vector<NodeID> Graph::reduce(bool out0, bool in0, bool out1, bool in1, bool loop
 }
 
 
-vector<vector<NodeID>> Graph::getstronglyconnectedcomponents() {
+vector<vector<NodeID> > Graph::getstronglyconnectedcomponents() {
     _tarjanCurrentIndex = 0;
     _tarjanIndex = vector<int>(currentMax);
     _tarjanAncestor = vector<int>(currentMax);
@@ -865,7 +867,6 @@ vector<NodeID> Graph::shortestCycle() {
             n = h.GetNumVertices();
             h.In0();
             h.Out0();
-            //cout << n << "/" << h.GetNumVertices() << endl;
         } while (n != h.GetNumVertices());
         vector<int> shortestCycle;
         vector<int> currentCycle;
@@ -873,7 +874,6 @@ vector<NodeID> Graph::shortestCycle() {
         for (set<int>::iterator it = GetVertices().begin(); it != GetVertices().end(); ++it) {
             if(h.hasVertex(*it))
             {
-                //cout << "It has this vertex" << endl;
                 currentCycle = h._shortestCycle(*it, maxLength);
                 if (int(currentCycle.size() - 1)  < maxLength) {
                     shortestCycle = currentCycle;
@@ -881,40 +881,25 @@ vector<NodeID> Graph::shortestCycle() {
                 }
             }else{
                 continue;
-            }/*
-            currentCycle = h._shortestCycle(*it, maxLength);
-            if (int(currentCycle.size() - 1)  < maxLength) {
-                shortestCycle = currentCycle;
-                maxLength = int(currentCycle.size()) - 1;
-            }*/
+            }
         }
         return shortestCycle;
     }
 }
 
 vector<int> Graph::_shortestCycle(int vertex, int maxLength) {
-    //cout << "_shortestCycle" << endl;
     queue< list<int> > paths;
     list<int> path;
     path.push_back(vertex);
     paths.push(path);
     bool cycleFound = false;
-    //cout << "Just before the while" << endl;
     while (!cycleFound && !paths.empty()) {
         path = paths.front();
-      //  cout << "path = paths.front();" << endl;
         paths.pop();
-        //  cout << "paths.pop();" << endl;
         cycleFound = int(path.size()) > 1 && path.front() == path.back();
-        //cout << "cycleFound = int(path.size()) > 1 && path.front() == path.back();" << endl;
         if (!cycleFound && int(path.size()) - 1 < maxLength) {
-            //  cout << "if (!cycleFound && int(path.size()) - 1 < maxLength) {" << endl;
-            //cout << path.back() << endl;
-            //cout << (this->hasVertex(path.back()) ? "Yes" : "No") << endl;
             vector<int> outN = OutGoing(path.back());
-            //cout << outN.size() << endl;
-            //cout << "vector<int> outN = OutGoing(path.back());" << endl;
-            for (vector<int>::const_iterator it = outN.begin();
+            for (auto it = outN.begin();
                  it != outN.end(); ++it) {
                 path.push_back(*it);
                 paths.push(path);
