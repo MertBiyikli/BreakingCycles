@@ -18,8 +18,7 @@ The following sequence of commands downloads and builds the BreakingCycle:
 ```
 git clone https://github.com/MertBiyikli/BreakingCycles.git
 cd BreakingCycle
-mkdir build
-cd build
-cmake ..
+cd app
 make
+./heuristic [graphfile]
 ```
