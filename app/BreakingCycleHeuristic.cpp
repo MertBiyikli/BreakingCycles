@@ -19,7 +19,7 @@ void term(int signum)
     tle = 1;
 }
 
-int main(int argc, char** argv)
+int main()
 {
     struct sigaction action;
     memset(&action, 0, sizeof(struct sigaction));
@@ -27,13 +27,8 @@ int main(int argc, char** argv)
     sigaction(SIGTERM, &action, NULL);
 
     ios_base::sync_with_stdio(false);
-    if (argc < 2) {
-        std::cerr << "usage: verifer [graph file] [solution file]" << std::endl;
-        return -1;
-    }
     Graph G;
-    string GraphName = argv[1];
-    int error = ReadGraph(GraphName, G);
+    int error = ReadGraph(G);
     if(error!=0)
     {
         std::cerr << "Problems accured!" << std::endl;
@@ -41,22 +36,10 @@ int main(int argc, char** argv)
     }
     MakeMinimalSorting M(G);
     auto fvs = M.Compute();
-    Graph H = G;
-    H.DeleteVertices(fvs);
-    if(H.isAcyclic())
-    {
-        cout << "The graph is acyclic and the FVS has size " << fvs.size() << endl;
-    }else{
-        cout << "the graph still contains cycles" << endl;
-    }
-
-    ofstream SolutionFile;
-    SolutionFile.open(GraphName+"_solution.txt");
     for(const auto& v : fvs)
     {
-        SolutionFile << v << endl;
+        cout << v << endl;
     }
-    SolutionFile.close();
     return 0;
 }
 
