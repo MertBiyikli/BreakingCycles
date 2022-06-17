@@ -11,6 +11,7 @@
 #include <queue>
 #include <stack>
 #include <list>
+#include <algorithm>
 
 
 using namespace std;
