@@ -38,7 +38,7 @@ int main()
     auto fvs = M.Compute();
     for(const auto& v : fvs)
     {
-        cout << v << endl;
+        cout << v+1 << endl;
     }
     return 0;
 }
